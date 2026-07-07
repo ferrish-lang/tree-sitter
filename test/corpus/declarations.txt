@@ -1,0 +1,101 @@
+================================================================================
+Declarations and type annotations
+================================================================================
+
+let names: string[] = ["Ada", "Grace"];
+const metadata: map<string, string[]> = { team: ["compiler"] };
+
+interface Address {
+  city: string;
+  tags: string[];
+}
+
+record User {
+  address: Address;
+  metadata: map<string, string>;
+}
+
+function collect (items: string[], index: number): User[] {
+  let first: string = items;
+  return names;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier)
+      (array_type_suffix))
+    (array_literal
+      (string_literal)
+      (string_literal)))
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier)
+      (generic_type_suffix
+        (type_annotation_list
+          (type_annotation
+            (identifier))
+          (type_annotation
+            (identifier)
+            (array_type_suffix)))))
+    (object_literal
+      (object_entry
+        (identifier)
+        (array_literal
+          (string_literal)))))
+  (structured_type_declaration
+    (identifier)
+    (structured_type_body
+      (structured_type_field
+        (identifier)
+        (type_annotation
+          (identifier)))
+      (structured_type_field
+        (identifier)
+        (type_annotation
+          (identifier)
+          (array_type_suffix)))))
+  (structured_type_declaration
+    (identifier)
+    (structured_type_body
+      (structured_type_field
+        (identifier)
+        (type_annotation
+          (identifier)))
+      (structured_type_field
+        (identifier)
+        (type_annotation
+          (identifier)
+          (generic_type_suffix
+            (type_annotation_list
+              (type_annotation
+                (identifier))
+              (type_annotation
+                (identifier))))))))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_annotation
+          (identifier)
+          (array_type_suffix)))
+      (parameter
+        (identifier)
+        (type_annotation
+          (identifier))))
+    (type_annotation
+      (identifier)
+      (array_type_suffix))
+    (block
+      (variable_declaration
+        (identifier)
+        (type_annotation
+          (identifier))
+        (identifier))
+      (return_statement
+        (identifier)))))

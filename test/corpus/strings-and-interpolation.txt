@@ -1,0 +1,22 @@
+================================================================================
+String forms and interpolation text
+================================================================================
+
+"escaped \"double\" quote"
+'single quoted value'
+`hello ${name}`
+`escaped \`tick\` and ${value + 1}`
+"""
+first line
+second line ${still text}
+third line
+"""
+
+--------------------------------------------------------------------------------
+
+(program
+  (string_literal)
+  (single_quoted_string)
+  (string_interpolation)
+  (string_interpolation)
+  (multiline_string))

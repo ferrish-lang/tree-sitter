@@ -1,0 +1,242 @@
+================================================================================
+Parenthesized, array, object, and expression statements
+================================================================================
+
+(name);
+[1, true, name];
+[];
+{ enabled: true, count: 2, nested: { items: [1, 2, 3] } };
+({ item: name });
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (parenthesized_expression
+      (identifier)))
+  (expression_statement
+    (array_literal
+      (number_literal)
+      (boolean_literal)
+      (identifier)))
+  (expression_statement
+    (array_literal))
+  (expression_statement
+    (object_literal
+      (object_entry
+        (identifier)
+        (boolean_literal))
+      (object_entry
+        (identifier)
+        (number_literal))
+      (object_entry
+        (identifier)
+        (object_literal
+          (object_entry
+            (identifier)
+            (array_literal
+              (number_literal)
+              (number_literal)
+              (number_literal)))))))
+  (expression_statement
+    (parenthesized_expression
+      (object_literal
+        (object_entry
+          (identifier)
+          (identifier))))))
+
+================================================================================
+Calls, postfix access, and update expressions
+================================================================================
+
+foo();
+console.log(name, 1, true);
+git.status();
+obj.prop;
+arr[i];
+arr[i]++;
+i++;
+++i;
+i--;
+--i;
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (function_call
+      (identifier)
+      (argument_list)))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (identifier)
+        (number_literal)
+        (boolean_literal))))
+  (expression_statement
+    (builtin_method_call
+      (identifier)
+      (identifier)
+      (argument_list)))
+  (expression_statement
+    (property_access
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (array_access
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (postfix_update_expression
+      (array_access
+        (identifier)
+        (identifier))))
+  (expression_statement
+    (postfix_update_expression
+      (identifier)))
+  (expression_statement
+    (prefix_update_expression
+      (identifier)))
+  (expression_statement
+    (postfix_update_expression
+      (identifier)))
+  (expression_statement
+    (prefix_update_expression
+      (identifier))))
+
+================================================================================
+Lambda expressions
+================================================================================
+
+array.map(people, (person) => { return person.name; });
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (builtin_method_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (identifier)
+        (lambda_expression
+          (lambda_parameter_list
+            (identifier))
+          (block
+            (return_statement
+              (property_access
+                (identifier)
+                (identifier)))))))))
+
+================================================================================
+Binary, unary, assignment, and ternary precedence
+================================================================================
+
+1 + 2 * 3;
+(1 + 2) * 3;
+!ready || count >= 3 && total < limit;
+ready && enabled && live;
+left == right;
+left === right;
+left != right;
+left !== right;
+foo = bar = baz;
+total + -delta;
+result = flag ? left + 1 : right * 2;
+value > 80 ? "crit" : value > 60 ? "warn" : "ok";
+target = enabled ? primary = backup : fallback;
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (additive
+      (number_literal)
+      (multiplicative
+        (number_literal)
+        (number_literal))))
+  (expression_statement
+    (multiplicative
+      (parenthesized_expression
+        (additive
+          (number_literal)
+          (number_literal)))
+      (number_literal)))
+  (expression_statement
+    (logical_or
+      (unary_expression
+        (identifier))
+      (logical_and
+        (relational
+          (identifier)
+          (number_literal))
+        (relational
+          (identifier)
+          (identifier)))))
+  (expression_statement
+    (logical_and
+      (logical_and
+        (identifier)
+        (identifier))
+      (identifier)))
+  (expression_statement
+    (equality
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (equality
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (equality
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (equality
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (assignment_expression
+        (identifier)
+        (identifier))))
+  (expression_statement
+    (additive
+      (identifier)
+      (unary_expression
+        (identifier))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (ternary
+        (identifier)
+        (additive
+          (identifier)
+          (number_literal))
+        (multiplicative
+          (identifier)
+          (number_literal)))))
+  (expression_statement
+    (ternary
+      (relational
+        (identifier)
+        (number_literal))
+      (string_literal)
+      (ternary
+        (relational
+          (identifier)
+          (number_literal))
+        (string_literal)
+        (string_literal))))
+  (expression_statement
+    (assignment_expression
+      (identifier)
+      (ternary
+        (identifier)
+        (assignment_expression
+          (identifier)
+          (identifier))
+        (identifier)))))

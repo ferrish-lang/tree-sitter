@@ -1,0 +1,40 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "ferrish",
+      "camelcase": "Ferrish",
+      "title": "Ferrish",
+      "scope": "source.ferrish",
+      "path": ".",
+      "file-types": [
+        "frsh"
+      ],
+      "highlights": "queries/highlights.scm",
+      "locals": "queries/locals.scm",
+      "folds": "queries/folds.scm",
+      "indents": "queries/indents.scm"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Standalone Tree-sitter grammar for Ferrish; no external scanner needed for the current corpus.",
+    "authors": [
+      {
+        "name": "Ferrish contributors"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/ferrish-lang/tree-sitter-ferrish"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": false,
+    "node": false,
+    "python": false,
+    "rust": false,
+    "swift": false
+  }
+}

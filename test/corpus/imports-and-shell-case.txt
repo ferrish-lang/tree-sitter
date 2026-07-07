@@ -1,0 +1,279 @@
+================================================================================
+Simple import fixture pattern
+================================================================================
+
+import "utils.frsh";
+import "math.frsh";
+let result: number = add(5, 3);
+let squared: number = square(4);
+let product: number = multiply(6, 7);
+console.log("Addition result: " + result);
+console.log("Square of 4: " + squared);
+console.log("Product of 6 and 7: " + product);
+console.log(sharedMessage);
+console.log("Math constant: " + mathConstant);
+let greeting: string = greet("Ferrish Language");
+console.log(greeting);
+
+--------------------------------------------------------------------------------
+
+(program
+  (import_statement
+    (import_path
+      (double_quoted_import_path))
+    (import_trailing))
+  (import_statement
+    (import_path
+      (double_quoted_import_path))
+    (import_trailing))
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (function_call
+      (identifier)
+      (argument_list
+        (number_literal)
+        (number_literal))))
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (function_call
+      (identifier)
+      (argument_list
+        (number_literal))))
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (function_call
+      (identifier)
+      (argument_list
+        (number_literal)
+        (number_literal))))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (additive
+          (string_literal)
+          (identifier)))))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (additive
+          (string_literal)
+          (identifier)))))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (additive
+          (string_literal)
+          (identifier)))))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (identifier))))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (additive
+          (string_literal)
+          (identifier)))))
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (function_call
+      (identifier)
+      (argument_list
+        (string_literal))))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (identifier)))))
+
+================================================================================
+Nested import fixture pattern
+================================================================================
+
+import "utils.frsh";
+import "advanced_math.frsh";
+console.log("Testing nested imports:");
+let number: number = 3;
+let cubed: number = cube(number);
+let fact: number = factorial(4);
+console.log(greet("Nested Imports"));
+console.log(sharedMessage);
+
+--------------------------------------------------------------------------------
+
+(program
+  (import_statement
+    (import_path
+      (double_quoted_import_path))
+    (import_trailing))
+  (import_statement
+    (import_path
+      (double_quoted_import_path))
+    (import_trailing))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (string_literal))))
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (number_literal))
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (function_call
+      (identifier)
+      (argument_list
+        (identifier))))
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (function_call
+      (identifier)
+      (argument_list
+        (number_literal))))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (function_call
+          (identifier)
+          (argument_list
+            (string_literal))))))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (identifier)))))
+
+================================================================================
+Single-quoted and unquoted imports keep trailing text
+================================================================================
+
+import 'utils.frsh';
+import advanced_math.frsh as advanced_math
+let label: string = "not an import";
+console.log(label);
+
+--------------------------------------------------------------------------------
+
+(program
+  (import_statement
+    (import_path
+      (single_quoted_import_path))
+    (import_trailing))
+  (import_statement
+    (import_path
+      (unquoted_import_path))
+    (import_trailing))
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (string_literal))
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (identifier)))))
+
+================================================================================
+Shell case block stays opaque at top level
+================================================================================
+
+case "$1" in
+foo)
+echo "foo"
+;;
+*)
+echo "other"
+;;
+esac
+console.log("done");
+
+--------------------------------------------------------------------------------
+
+(program
+  (shell_case_statement)
+  (expression_statement
+    (console_log_call
+      (identifier)
+      (identifier)
+      (argument_list
+        (string_literal)))))
+
+================================================================================
+Shell case block can include inline esac-adjacent patterns
+================================================================================
+
+case ${bucket} in
+  release)
+    echo "release"
+    ;;
+  *)
+    echo "default"
+    ;;
+esac
+let done: boolean = true;
+
+--------------------------------------------------------------------------------
+
+(program
+  (shell_case_statement)
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (boolean_literal)))
+
+================================================================================
+Indented shell case block remains opaque before later Ferrish code
+================================================================================
+
+case "$mode" in
+  build)
+    npm run compile
+    ;;
+
+  test)
+    npm test
+    ;;
+esac
+let status: string = "finished";
+
+--------------------------------------------------------------------------------
+
+(program
+  (shell_case_statement)
+  (variable_declaration
+    (identifier)
+    (type_annotation
+      (identifier))
+    (string_literal)))

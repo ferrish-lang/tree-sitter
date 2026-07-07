@@ -1,0 +1,15 @@
+[
+  (block)
+  (function_declaration)
+  (structured_type_declaration)
+  (structured_type_body)
+  (switch_statement)
+  (case_clause)
+  (default_clause)
+  (array_literal)
+  (object_literal)
+  (parameter_list)
+  (argument_list)
+  (multiline_string)
+  (string_interpolation)
+] @fold

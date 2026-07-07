@@ -1,0 +1,30 @@
+================================================================================
+Comments and literals
+================================================================================
+
+#!/usr/bin/env ferrish
+true
+false
+"double"
+'single'
+-42
+123
+name
+// trailing comment
+/* block comment */
+# hash comment
+
+--------------------------------------------------------------------------------
+
+(program
+  (source_shebang_statement)
+  (boolean_literal)
+  (boolean_literal)
+  (string_literal)
+  (single_quoted_string)
+  (number_literal)
+  (number_literal)
+  (identifier)
+  (line_comment)
+  (block_comment)
+  (hash_comment))

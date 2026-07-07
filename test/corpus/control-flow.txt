@@ -1,0 +1,163 @@
+================================================================================
+Blocks, if/else chains, and while loops
+================================================================================
+
+{
+  if (ready) {
+    let state = 1;
+  } else if (retrying) {
+    while (count < limit) {
+      count++;
+      {
+        if (done) {
+          break;
+        }
+      }
+    }
+  } else {
+    continue;
+  }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (block
+    (if_statement
+      (identifier)
+      (block
+        (variable_declaration
+          (identifier)
+          (number_literal)))
+      (else_if_clause
+        (identifier)
+        (block
+          (while_statement
+            (relational
+              (identifier)
+              (identifier))
+            (block
+              (expression_statement
+                (postfix_update_expression
+                  (identifier)))
+              (block
+                (if_statement
+                  (identifier)
+                  (block
+                    (break_statement))))))))
+      (else_clause
+        (block
+          (continue_statement))))))
+
+================================================================================
+Classic for, for-in, parallel, and defer
+================================================================================
+
+for (let i = 0; i < total; i++) {
+  {
+    parallel work(i);
+  }
+}
+
+for (const item: string in items) {
+  {
+    defer cleanup(item);
+  }
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (for_statement
+    (variable_declaration
+      (identifier)
+      (number_literal))
+    (relational
+      (identifier)
+      (identifier))
+    (for_update
+      (postfix_update_expression
+        (identifier)))
+    (block
+      (block
+        (parallel_statement
+          (function_call
+            (identifier)
+            (argument_list
+              (identifier)))))))
+  (for_in_statement
+    (identifier)
+    (type_annotation
+      (identifier))
+    (identifier)
+    (block
+      (block
+        (defer_statement
+          (function_call
+            (identifier)
+            (argument_list
+              (identifier))))))))
+
+================================================================================
+Switch, try/catch, return, exit, and nested case bodies
+================================================================================
+
+switch (value) {
+  case 1, 2:
+    {
+      return value;
+    }
+  case "stop":
+    exit(value);
+    break;
+  default:
+    try {
+      risky();
+      return;
+    } catch ("boom") {
+      exit fallback;
+    }
+}
+
+try {
+  exit problem;
+} catch {
+  return;
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (switch_statement
+    (identifier)
+    (case_clause
+      (case_value_list
+        (number_literal)
+        (number_literal))
+      (block
+        (return_statement
+          (identifier))))
+    (case_clause
+      (case_value_list
+        (string_literal))
+      (exit_statement
+        (identifier))
+      (break_statement))
+    (default_clause
+      (try_catch_statement
+        (block
+          (expression_statement
+            (function_call
+              (identifier)
+              (argument_list)))
+          (return_statement))
+        (string_literal)
+        (block
+          (exit_statement
+            (identifier))))))
+  (try_catch_statement
+    (block
+      (exit_statement
+        (identifier)))
+    (block
+      (return_statement))))

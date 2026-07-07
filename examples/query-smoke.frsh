@@ -1,0 +1,60 @@
+#!/usr/bin/env ferrish
+import "./helpers";
+
+// highlight smoke sample
+/* keeps query categories exercised */
+# hash comment
+
+interface User {
+  name: string;
+  active: boolean;
+}
+
+record Config {
+  retries: number;
+  tags: string[];
+}
+
+function buildUser(name: string, retries: number): User {
+  let enabled: boolean = true;
+  const labels: string[] = ["alpha", 'beta', `user ${name}`];
+  const details: map<string, number> = { retries: retries, count: 2 };
+  const note: string = """multi
+line
+note""";
+
+  console.log(name, retries, enabled);
+  git.status();
+
+  if (!enabled || retries >= 3 && retries < 10) {
+    retries++;
+  } else if (retries == 1 || retries === 2 || retries != 4 || retries !== 5) {
+    --retries;
+  } else {
+    retries = enabled ? retries + 1 : retries * 2;
+  }
+
+  while (enabled) {
+    break;
+  }
+
+  for (let i = 0; i < retries; i++) {
+    continue;
+  }
+
+  for (const tag: string in labels) {
+    parallel buildUser(tag, retries);
+    defer git.status();
+  }
+
+  switch (name) {
+    case "stop", "wait":
+      return details.retries;
+    default:
+      try {
+        exit details.count;
+      } catch ("boom") {
+        return labels[0];
+      }
+  }
+}
