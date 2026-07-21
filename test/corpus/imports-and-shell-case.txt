@@ -205,6 +205,28 @@ console.log(label);
         (identifier)))))
 
 ================================================================================
+Default imports distinguish bindings from legacy trailing text
+================================================================================
+
+import git from "wrappers/git";
+import gitWrapper from "wrappers/git"
+import advanced_math.frsh as advanced_math
+
+--------------------------------------------------------------------------------
+
+(program
+  (default_import_statement
+    (identifier)
+    (double_quoted_import_path))
+  (default_import_statement
+    (identifier)
+    (double_quoted_import_path))
+  (import_statement
+    (import_path
+      (unquoted_import_path))
+    (import_trailing)))
+
+================================================================================
 Shell case block stays opaque at top level
 ================================================================================
 

@@ -39,7 +39,7 @@ Use the existing parser fixtures under `ferrish-lang/tests/fixtures/inputs/` as 
 | while loops + nested control flow | `while_loop.formatted.frsh` | Minimal `while_statement` example with block structure, nested `if_statement`, `break_statement`, reassignment, and a clean post-loop statement. |
 | for-in loops | `for_in_loop.frsh` | Dedicated coverage for `for_in_statement` with typed loop variables, iterable expressions, and interpolated-string use inside the loop body. |
 | switch/case/default | `switch_case.frsh` | Exercises `switch_statement`, numeric and string case values, grouped/fall-through cases, `default_clause`, and repeated `break_statement` usage. |
-| imports | `simple_import.frsh`, `nested_import.formatted.frsh` | Use `simple_import.frsh` for the baseline quoted-path import shape and `nested_import.formatted.frsh` for repeated import statements before later unsupported interpolation lines; standalone corpus also adds single-quoted and unquoted-path trailing-text coverage. |
+| imports | `simple_import.frsh`, `nested_import.formatted.frsh` | Use these for the preserved legacy `import_statement` path shape; the standalone grammar also adds `default_import_statement` coverage for wrapper imports with a binding and `from` source, plus single-quoted and unquoted-path trailing-text compatibility coverage. |
 | defer | `defer_basic.frsh` | Focused `defer_statement` coverage with almost no surrounding syntax noise; good sentinel for the statement form that the Zed draft currently misses. |
 | ternaries + precedence | `ternary_operators.formatted.frsh` | Covers simple and nested ternaries, arithmetic/relational precedence inside ternary branches, and assignment-style usage that stresses the operator ladder. |
 | arrays + objects + namespace/property-style calls | `json_property_access.formatted.formatted.frsh` | Stable fixture for object-typed values, single-quoted JSON strings, namespace calls such as `json.parse/get/has`, and path-like string arguments used with property-oriented operations. |
@@ -53,7 +53,7 @@ Use the existing parser fixtures under `ferrish-lang/tests/fixtures/inputs/` as 
 | structured types | `structured_types.formatted.frsh` |
 | loops | `while_loop.formatted.frsh`, `for_in_loop.frsh` |
 | switch/case | `switch_case.frsh` |
-| imports | `simple_import.frsh`, `nested_import.formatted.frsh` |
+| imports | `simple_import.frsh`, `nested_import.formatted.frsh` (`import_statement` and `default_import_statement`) |
 | defer | `defer_basic.frsh` |
 | arrays/objects | `structured_types.formatted.frsh`, `json_property_access.formatted.formatted.frsh` |
 | ternaries | `ternary_operators.formatted.frsh` |
@@ -122,8 +122,9 @@ These captures match the current Zed query intent and should remain available in
 
 | Pest rule | Planned Tree-sitter node / treatment | Fields / aliases / captures | Status | Notes |
 | --- | --- | --- | --- | --- |
-| `statement` | `_statement` | internal supertype | implemented | Standalone grammar covers the pest statement surface, including `method_call_statement`, `import_statement`, and a scanner-free `shell_case_statement` token island as real statement nodes. |
-| `import_statement` | `import_statement` | `source:` child `import_path`, optional `trailing:` raw-text child | implemented | Standalone grammar parses imports as statement nodes instead of letting quoted paths collapse into ordinary string expressions; corpus coverage is anchored to the `simple_import.frsh` and `nested_import.formatted.frsh` fixture shapes. |
+| `statement` | `_statement` | internal supertype | implemented | Standalone grammar covers the pest statement surface, including `method_call_statement`, both `default_import_statement` and preserved legacy `import_statement`, and a scanner-free `shell_case_statement` token island as real statement nodes. |
+| `default_import_statement` | `default_import_statement` | `binding:` identifier, `source:` quoted import path | implemented | Wrapper/default imports preserve the binding and `from` source as explicit fields; query captures mark `from` as control syntax, the source as `@string.special`, and the binding as a variable/local definition. |
+| `import_statement` | `import_statement` | `source:` child `import_path`, optional `trailing:` raw-text child | implemented | Preserved legacy compatibility node for imports without a binding; standalone grammar parses imports as statement nodes instead of letting quoted paths collapse into ordinary string expressions. Its `import_path` wrapper is captured as `@string.special`. |
 | `import_path` | `import_path` wrapping concrete import-path tokens | `source:` on parent; `@string.special` or `@string` | implemented | Preserves double-quoted, single-quoted, and unquoted path forms as distinct children under the import-only wrapper node, without reusing the ordinary `string_literal` / `single_quoted_string` nodes. |
 | `import_path_inner` | no standalone CST node | folded into string token text | deferred | Pest helper only. |
 | `unquoted_import_path` | `unquoted_import_path` | child under `import_path` | implemented | Covers non-quoted import paths without reusing the generic `identifier` token. |

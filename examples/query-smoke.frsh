@@ -1,5 +1,6 @@
 #!/usr/bin/env ferrish
 import "./helpers";
+import helpers from "./helpers";
 
 // highlight smoke sample
 /* keeps query categories exercised */

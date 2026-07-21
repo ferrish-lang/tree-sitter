@@ -23,6 +23,9 @@
 (for_in_statement
   name: (identifier) @local.definition.variable)
 
+(default_import_statement
+  binding: (identifier) @local.definition.variable)
+
 (argument_list
   (identifier) @local.reference)
 

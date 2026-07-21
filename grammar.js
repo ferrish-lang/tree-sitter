@@ -41,6 +41,7 @@ module.exports = grammar({
 
     _statement: ($) => choice(
       $.block,
+      $.default_import_statement,
       $.import_statement,
       $.variable_declaration,
       $.structured_type_declaration,
@@ -175,6 +176,17 @@ module.exports = grammar({
     identifier: () => /[A-Za-z_][A-Za-z0-9_]*/,
 
     source_shebang_statement: () => token(seq('#!', /[^\n]*/)),
+
+    default_import_statement: ($) => prec(2, seq(
+      'import',
+      field('binding', $.identifier),
+      'from',
+      field('source', choice(
+        $.double_quoted_import_path,
+        $.single_quoted_import_path
+      )),
+      optional(';')
+    )),
 
     import_statement: ($) => seq(
       'import',

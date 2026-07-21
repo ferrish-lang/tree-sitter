@@ -21,9 +21,19 @@
   "catch"
   "defer"
   "import"
+  "from"
   "parallel"
   "exit"
 ] @keyword.control
+
+(default_import_statement
+  source: [(double_quoted_import_path) (single_quoted_import_path)] @string.special)
+
+(import_statement
+  source: (import_path) @string.special)
+
+(default_import_statement
+  binding: (identifier) @variable)
 
 [
   "let"
