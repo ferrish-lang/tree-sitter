@@ -1,0 +1,13 @@
+import "./helpers";
+import helpers from "./helpers";
+
+case "$1" in
+foo)
+echo "foo"
+;;
+*)
+echo "other"
+;;
+esac
+
+console.log("done");

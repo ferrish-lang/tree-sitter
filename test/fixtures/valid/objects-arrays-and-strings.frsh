@@ -1,0 +1,8 @@
+const details: map<string, number> = { retries: 2, count: 3 };
+const values: number[] = [details.retries, 4];
+const note: string = "double";
+const quoted: string = 'single';
+const interpolated: string = `count ${details.count}`;
+const multiline: string = """first
+second""";
+details.count;

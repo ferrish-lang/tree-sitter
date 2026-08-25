@@ -1,13 +1,19 @@
 # Ferrish grammar/source mapping
 
+The canonical grammar source is https://github.com/ferrish-lang/tree-sitter.git.
+This document describes the standalone grammar and its repository-owned
+fixtures; it does not depend on a sibling checkout.
+
 Status legend:
 
-- **implemented** — present in `zed-extension/languages/ferrish/grammar.js`
-- **planned** — should exist in `tree-sitter-ferrish`, but is missing or incomplete in the draft
+- **implemented** — present in this repository's `grammar.js`
+- **planned** — should exist in this standalone grammar, but is missing or incomplete in the draft
 - **deferred** — intentionally postponed for the first standalone grammar cut
 - **scanner-risk** — likely needs an external scanner or careful lexical conflict handling
 
-This document maps the current pest grammar (`ferrish-lang/src/grammar.pest`) and Rust AST (`ferrish-lang/src/ast.rs`) to the planned Tree-sitter CST. It also records where the existing Zed draft grammar already matches, where it diverges, and which query captures should be preserved.
+This document maps the current Ferrish syntax to the Tree-sitter CST and records
+which query captures are preserved. The standalone fixtures are acceptance
+samples, not a copied Rust fixture suite.
 
 ## High-level decisions
 
@@ -27,47 +33,47 @@ This document maps the current pest grammar (`ferrish-lang/src/grammar.pest`) an
 14. Treat `{ ... }` as a real `block` statement wherever statement lists are accepted, but keep semicolon requirements on `return`, `exit`, `break`, `continue`, `parallel`, `defer`, declarations, and ordinary `expression_statement` aligned with `grammar.pest`.
 15. Match pest's special `exit` syntax by accepting both `exit value;` and `exit(value);`, and bias the explicit-parentheses form so `exit(value);` attaches the inner expression directly as the `value` child instead of surfacing an extra `parenthesized_expression` node.
 
-## Development fixture matrix
+## Standalone fixture matrix
 
-Use the existing parser fixtures under `ferrish-lang/tests/fixtures/inputs/` as the development corpus for `tree-sitter-ferrish`. This keeps coverage tied to the active Rust parser/AST fixtures rather than the incomplete Zed draft.
+The passing parser sweep discovers every `.frsh` file under
+`test/fixtures/valid/`. These compact samples are owned by this repository and
+are intentionally independent of any sibling checkout.
 
 | Syntax family | Fixture | Why this fixture is in the representative set |
 | --- | --- | --- |
-| declarations + typed bindings | `variable_declaration.frsh` | Small, stable baseline for `let` bindings, explicit type annotations, assignments, builtin/namespace calls, string interpolation, and a comparison expression in one short file. |
-| function declarations + returns + calls | `function_declarations.formatted.frsh` | Covers named functions, parameters, return types, `return_statement`, function-call expressions, and follow-on expression statements without mixing in unrelated control flow. |
-| structured types | `structured_types.formatted.frsh` | Best single fixture for `interface`, `record`, field type syntax, nested object literals, array literals, typed arrays, chained property access on structured values, and the current lambda-expression shape used in `array.map(...)`. |
-| while loops + nested control flow | `while_loop.formatted.frsh` | Minimal `while_statement` example with block structure, nested `if_statement`, `break_statement`, reassignment, and a clean post-loop statement. |
-| for-in loops | `for_in_loop.frsh` | Dedicated coverage for `for_in_statement` with typed loop variables, iterable expressions, and interpolated-string use inside the loop body. |
-| switch/case/default | `switch_case.frsh` | Exercises `switch_statement`, numeric and string case values, grouped/fall-through cases, `default_clause`, and repeated `break_statement` usage. |
-| imports | `simple_import.frsh`, `nested_import.formatted.frsh` | Use these for the preserved legacy `import_statement` path shape; the standalone grammar also adds `default_import_statement` coverage for wrapper imports with a binding and `from` source, plus single-quoted and unquoted-path trailing-text compatibility coverage. |
-| defer | `defer_basic.frsh` | Focused `defer_statement` coverage with almost no surrounding syntax noise; good sentinel for the statement form that the Zed draft currently misses. |
-| ternaries + precedence | `ternary_operators.formatted.frsh` | Covers simple and nested ternaries, arithmetic/relational precedence inside ternary branches, and assignment-style usage that stresses the operator ladder. |
-| arrays + objects + namespace/property-style calls | `json_property_access.formatted.formatted.frsh` | Stable fixture for object-typed values, single-quoted JSON strings, namespace calls such as `json.parse/get/has`, and path-like string arguments used with property-oriented operations. |
+| declarations + types | `test/fixtures/valid/declarations-and-types.frsh` | Interfaces, records, typed bindings, object and array literals, single/interpolated strings, and property access. |
+| functions + control flow | `test/fixtures/valid/functions-and-control-flow.frsh` | Functions, parameters, returns, if/else, loops, switch, `defer`, and updates. |
+| imports + shell case | `test/fixtures/valid/imports-and-shell-case.frsh` | Legacy and default imports plus the supported opaque shell-case form. |
+| objects + arrays + strings | `test/fixtures/valid/objects-arrays-and-strings.frsh` | Generic types, object/array access, double/single/multiline/interpolated strings. |
+| negative parser behavior | `test/fixtures/negative/missing-semicolon.frsh` | Expected `ERROR`/`MISSING` sentinel; checked separately from passing fixtures. |
 
 ### Coverage summary by major syntax family
 
 | Major syntax family | Representative fixture(s) |
 | --- | --- |
-| declarations | `variable_declaration.frsh`, `structured_types.formatted.frsh` |
-| functions | `function_declarations.formatted.frsh` |
-| structured types | `structured_types.formatted.frsh` |
-| loops | `while_loop.formatted.frsh`, `for_in_loop.frsh` |
-| switch/case | `switch_case.frsh` |
-| imports | `simple_import.frsh`, `nested_import.formatted.frsh` (`import_statement` and `default_import_statement`) |
-| defer | `defer_basic.frsh` |
-| arrays/objects | `structured_types.formatted.frsh`, `json_property_access.formatted.formatted.frsh` |
-| ternaries | `ternary_operators.formatted.frsh` |
-| namespace calls | `variable_declaration.frsh`, `structured_types.formatted.frsh`, `json_property_access.formatted.formatted.frsh` |
+| declarations | `declarations-and-types.frsh` |
+| functions | `functions-and-control-flow.frsh` |
+| structured types | `declarations-and-types.frsh` |
+| loops | `functions-and-control-flow.frsh` |
+| switch/case | `functions-and-control-flow.frsh` |
+| imports | `imports-and-shell-case.frsh` |
+| defer | `functions-and-control-flow.frsh` |
+| arrays/objects | `declarations-and-types.frsh`, `objects-arrays-and-strings.frsh` |
+| literals | `declarations-and-types.frsh`, `objects-arrays-and-strings.frsh` |
+| property access | `declarations-and-types.frsh`, `objects-arrays-and-strings.frsh` |
 
 Notes:
 
-1. `structured_types.formatted.frsh` is intentionally overloaded because it is the densest stable fixture for records/interfaces, object literals, arrays, chained property access, and the lambda-expression shape currently exercised by `array.map(..., (person) => ...)`.
-2. `json_property_access.formatted.formatted.frsh` is kept despite the doubled `.formatted` suffix because it is the clearest existing namespace-call fixture in the current corpus.
-3. All selected fixtures are checked-in parser fixtures already used by the Rust-side project.
+1. The fixture files are deliberately compact and repository-owned so a fresh
+   clone can qualify the grammar without a sibling project.
+2. `examples/query-smoke.frsh` is the larger query sample; it is separate from
+   the parser fixture sweep so query capture checks can name their evidence.
+3. Negative fixtures are expected to fail and are checked by
+   `npm run test:fixtures:negative`.
 
 ### Standalone grammar verification command
 
-Run the same curated subset from `tree-sitter-ferrish/` with:
+Run the standalone fixture directory with:
 
 ```sh
 npm run parse:fixtures
@@ -75,23 +81,15 @@ npm run parse:fixtures
 
 That script parses exactly:
 
-- `variable_declaration.frsh`
-- `function_declarations.formatted.frsh`
-- `structured_types.formatted.frsh`
-- `while_loop.formatted.frsh`
-- `for_in_loop.frsh`
-- `switch_case.frsh`
-- `simple_import.frsh`
-- `nested_import.formatted.frsh`
-- `defer_basic.frsh`
-- `ternary_operators.formatted.frsh`
-- `json_property_access.formatted.formatted.frsh`
+- every `.frsh` file under `test/fixtures/valid/`
 
-Because it prints full syntax trees, any `ERROR` or `MISSING` node stays visible in command output. `npm run parse:fixtures:check` is intended to fail non-zero when either node kind appears.
+Because it prints full syntax trees, any `ERROR` or `MISSING` node stays visible
+in command output. `npm run parse:fixtures:check` fails non-zero when either
+node kind appears or the fixture root is missing.
 
 ## Planned query capture baseline
 
-These captures match the current Zed query intent and should remain available in `tree-sitter-ferrish/queries/*`:
+These captures match the editor-query intent and should remain available in this repository's `queries/`:
 
 - `@keyword`: statement/control/declaration keywords
 - `@comment`, `@comment.inclusive`: line, block, hash, shebang comments as appropriate
@@ -324,11 +322,13 @@ These captures match the current Zed query intent and should remain available in
 8. `program` still accepts a pragmatic `_statement_or_expression` mix so the standalone corpus can cover both bare literals and statement syntax, but `block`, `switch`, and other nested statement bodies are now restricted to real `_statement` forms, with `block` itself admitted as a statement for nested control-flow bodies.
 9. VS Code TextMate grammar reality differs from both pest and Zed draft: its `single-strings` repository entry is never included at the top level, so single-quoted strings are likely under-highlighted there.
 
-## Recommended first standalone `tree-sitter-ferrish` cut
+## Maintenance boundaries
 
-1. Carry over the already-working declaration/control-flow/literal nodes from the Zed draft.
-2. Keep extending the precedence ladder outward from the now-working `_postfix_expression` core instead of reviving the old broken `unary -> postfix` draft shape verbatim.
-3. Query work can now treat `import_statement` as implemented; `source_shebang_statement` and `hash_comment` are also in place.
-4. Keep `shell_case_statement` scanner-free for now; no external scanner is needed for the current corpus, but promote it once real Ferrish inputs need to ignore `esac` inside shell strings, comments, or pattern labels.
-5. Keep `console_log_call` explicit, even though it parallels `builtin_method_call`, so query captures for the hard-coded namespace/method pair remain trivial.
-6. Keep string nodes distinct, but defer structural `${...}` interpolation parsing until parser/consumer requirements are clearer.
+1. Keep `grammar.js` as the source of truth and regenerate tracked parser
+   artifacts with the locked CLI.
+2. Keep `shell_case_statement` scanner-free until real inputs require ignoring
+   `esac` inside shell strings, comments, or pattern labels.
+3. Keep `console_log_call` explicit so namespace and method captures remain
+   stable.
+4. Keep string nodes distinct, but defer structural `${...}` interpolation
+   parsing until parser and consumer requirements are clearer.

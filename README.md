@@ -1,48 +1,72 @@
 # tree-sitter-ferrish
 
-Standalone Tree-sitter grammar workspace for Ferrish.
+Standalone Tree-sitter grammar for Ferrish.
 
-See `docs/EDITOR-INTEGRATION.md` for how Tree-sitter queries relate to the current VS Code/TextMate grammar and for the future Zed handoff plan.
+The canonical source is https://github.com/ferrish-lang/tree-sitter.git. The
+npm package name remains `tree-sitter-ferrish`; it does not identify a second
+repository.
 
-## Scripts
+The verification toolchain is Node `24.18.0` and npm `11.16.0`, declared by
+`.node-version` and `package.json`. Use those exact versions for local and CI
+verification.
 
-- `npm run generate` — generate parser artifacts from `grammar.js`
-- `npm run parse:fixtures` — parse the curated Ferrish fixture subset from `../ferrish-lang/tests/fixtures/inputs/` and print each syntax tree so `ERROR`/`MISSING` nodes stay visible in review
-- `npm run parse:fixtures:check` — run the same parse sweep and fail if any `ERROR` or `MISSING` node appears in the output
-- `npm test` — run the Tree-sitter corpus tests
+## Verification
 
-## Fixture parsing smoke check
+Install the locked CLI and run the complete project gate:
 
-The curated fixture subset is the representative matrix from `docs/GRAMMAR-MAPPING.md`:
+```sh
+npm ci && npm run verify
+```
 
-- `variable_declaration.frsh`
-- `function_declarations.formatted.frsh`
-- `structured_types.formatted.frsh`
-- `while_loop.formatted.frsh`
-- `for_in_loop.frsh`
-- `switch_case.frsh`
-- `simple_import.frsh`
-- `nested_import.formatted.frsh`
-- `defer_basic.frsh`
-- `ternary_operators.formatted.frsh`
-- `json_property_access.formatted.formatted.frsh`
+`verify` runs these checks without installing packages, accessing a sibling
+checkout, using the network, or repairing the worktree:
 
-Review flow:
+1. `npm run check:generated` — regenerate in an isolated temporary directory
+   and compare `src/parser.c`, `src/grammar.json`, and `src/node-types.json`.
+2. `npm test` — run the complete Tree-sitter corpus.
+3. `npm run parse:fixtures:check` — parse every repository-owned fixture under
+   `test/fixtures/valid/` and reject `ERROR` or `MISSING` nodes.
+4. `npm run test:fixtures:negative` — verify direct diagnostics for the
+   expected parser-failure and missing-root cases.
+5. `npm run check:queries` — compile and execute every shipped query against a
+   representative Ferrish sample and assert the required captures.
 
-1. Run `npm run parse:fixtures` to print each parse tree.
-2. Scan for literal `ERROR` or `MISSING` nodes in the output.
-3. Run `npm run parse:fixtures:check` when you want the command to fail on either node kind.
+The focused commands are `npm run generate`, `npm test`,
+`npm run parse:fixtures:check`, `npm run test:fixtures:negative`,
+`npm run check:generated`, and `npm run check:queries`.
 
-To spot-check the query smoke sample directly:
+## Fixtures and releases
 
-- `npx tree-sitter parse examples/query-smoke.frsh`
-- `npx tree-sitter parse examples/query-smoke.frsh | rg 'ERROR|MISSING'`
+Fixtures are owned by this repository. They cover declarations and types,
+functions and control flow, objects and arrays, imports and shell-case syntax,
+and literal/interpolated strings. The mapping is documented in
+`docs/GRAMMAR-MAPPING.md`. `test/fixtures/negative/` contains parser-failure
+sentinels and is intentionally excluded from the passing fixture sweep.
+
+Generated parser output is tracked. Edit `grammar.js`, then run
+`npm run generate`; `npm run check:generated` must be clean before committing.
+
+The public qualification procedure is deliberately separate from normal local
+verification: a maintainer clones the canonical HTTPS repository into an empty
+directory without credentials, resolves the qualifying full 40-character SHA,
+checks out that SHA detached, and records the green gate output. Consumers must
+pin that exact SHA, never a branch, tag, local checkout, SSH URL, or generated
+fallback.
+
+To update a grammar revision, change `grammar.js` or query files, regenerate,
+run `npm ci && npm run verify`, commit the qualified revision, and have the
+consumer update to the new public full SHA only after anonymous HTTPS fetch
+verification. P12 owns its isolated Zed query/build verifier and manual dev-
+extension smoke check; P09 owns later canonical documentation publication.
 
 ## Layout
 
 - `grammar.js` — grammar definition
-- `examples/query-smoke.frsh` — real Ferrish sample used for query/highlight smoke checks
+- `src/parser.c`, `src/grammar.json`, `src/node-types.json` — generated artifacts
+- `examples/query-smoke.frsh` — representative query sample
+- `test/fixtures/valid/` — repository-owned parser fixtures
+- `test/fixtures/negative/` — expected parser-failure fixtures
 - `tree-sitter.json` — Tree-sitter package metadata
-- `queries/` — editor query placeholders
-- `test/corpus/` — parser corpus fixtures
-- `docs/GRAMMAR-MAPPING.md` — source grammar mapping and fixture plan
+- `queries/` — editor queries for highlights, locals, folds, and indents
+- `docs/EDITOR-INTEGRATION.md` — editor and immutable-consumer guidance
+- `docs/GRAMMAR-MAPPING.md` — syntax and fixture mapping

@@ -18,23 +18,39 @@ These tracks should stay semantically aligned, but they are not the same artifac
 
 Keeping that scope aligned makes it easier to reason about Ferrish highlighting across editors even though the underlying tokenization systems differ.
 
+The shipped query families are `highlights.scm`, `locals.scm`, `folds.scm`,
+and `indents.scm`. `npm run check:queries` compiles each query with the local
+Tree-sitter CLI and checks representative captures; it does not inspect query
+text or substitute a consumer's query set.
+
 ## Zed handoff plan
 
-This phase does **not** change anything under `zed-extension/`. The current handoff target is already wired in `zed-extension/extension.toml`:
+This repository is the canonical grammar publisher. P11 does **not** change
+anything under `zed-extension/`; the consumer handoff is an immutable public
+revision from this repository:
 
-- repository: `https://github.com/ferrish-lang/tree-sitter-ferrish`
-- revision: `rev = "main"`
+- repository: `https://github.com/ferrish-lang/tree-sitter.git`
+- revision: a full 40-character commit SHA selected by P12
 
-That `rev = "main"` value is only a placeholder. It is risky because Zed would track whatever happens to be on the moving default branch when the grammar is fetched, which makes behavior non-reproducible and can pull in unreviewed parser/query changes.
+Consumers must not use a branch, tag, local checkout, SSH URL, cache, or
+generated fallback. The qualifying revision is selected only after the
+publisher gate and an unauthenticated HTTPS fetch of the detached commit pass.
 
 When Zed is updated later, the follow-up should be:
 
-1. Ensure the desired parser artifacts and query files are committed in `tree-sitter-ferrish`.
-2. Choose a specific released commit SHA or tag for the grammar snapshot.
-3. Update `zed-extension/extension.toml` to keep the same repository URL but replace `rev = "main"` with that pinned commit or tag.
+1. Ensure the desired parser artifacts and query files are committed in
+   `https://github.com/ferrish-lang/tree-sitter.git`.
+2. Choose a qualifying full commit SHA after the publisher's local gate and
+   anonymous HTTPS fetch pass.
+3. Update the consumer manifest to keep the canonical repository URL and pin
+   that exact SHA.
 4. Leave `zed-extension/languages/ferrish/config.toml` focused on language behavior (`.frsh`, brackets, comments, word characters, completion query characters); it does not need to carry grammar revision state.
-5. Verify Zed against representative Ferrish samples to confirm highlighting, locals/folds behavior, and indentation still match expectations.
+5. Run P12's isolated fetched-grammar query/build verifier and its documented
+   manual Zed dev-extension smoke check against representative Ferrish samples.
 
 ## Practical maintenance rule
 
-Until Zed is explicitly switched to a pinned grammar revision, treat Tree-sitter query changes here as preparatory work for future Zed consumption rather than an active Zed behavior change.
+Until P12 explicitly switches to a pinned grammar revision, treat Tree-sitter
+query changes here as publisher output rather than an active Zed behavior
+change. This publisher does not claim hosted required-check or public-fetch
+evidence until a maintainer performs those HITL steps.

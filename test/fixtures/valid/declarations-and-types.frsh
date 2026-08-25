@@ -1,0 +1,13 @@
+interface User {
+  name: string;
+  active: boolean;
+}
+
+record Config {
+  retries: number;
+  tags: string[];
+}
+
+let user: User = { name: "Ada", active: true };
+const tags: string[] = ["compiler", 'tools', `user ${user.name}`];
+user.name;

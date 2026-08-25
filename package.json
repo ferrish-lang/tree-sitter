@@ -4,11 +4,26 @@
   "private": true,
   "description": "Standalone Tree-sitter grammar for Ferrish.",
   "license": "MIT",
+  "engines": {
+    "node": "24.18.0",
+    "npm": "11.16.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ferrish-lang/tree-sitter.git"
+  },
+  "packageManager": "npm@11.16.0",
   "scripts": {
     "generate": "tree-sitter generate",
-    "parse:fixtures": "sh -c 'set -eu; fixtures=\"../ferrish-lang/tests/fixtures/inputs/variable_declaration.frsh ../ferrish-lang/tests/fixtures/inputs/function_declarations.formatted.frsh ../ferrish-lang/tests/fixtures/inputs/structured_types.formatted.frsh ../ferrish-lang/tests/fixtures/inputs/while_loop.formatted.frsh ../ferrish-lang/tests/fixtures/inputs/for_in_loop.frsh ../ferrish-lang/tests/fixtures/inputs/switch_case.frsh ../ferrish-lang/tests/fixtures/inputs/simple_import.frsh ../ferrish-lang/tests/fixtures/inputs/nested_import.formatted.frsh ../ferrish-lang/tests/fixtures/inputs/defer_basic.frsh ../ferrish-lang/tests/fixtures/inputs/ternary_operators.formatted.frsh ../ferrish-lang/tests/fixtures/inputs/json_property_access.formatted.formatted.frsh\"; for fixture in $fixtures; do printf \"\\n### %s\\n\" \"$fixture\"; npx tree-sitter parse \"$fixture\"; done'",
-    "parse:fixtures:check": "sh -c 'set -eu; output=$(npm run --silent parse:fixtures); printf \"%s\\n\" \"$output\"; if printf \"%s\\n\" \"$output\" | rg -n \"ERROR|MISSING\" >/dev/null; then printf \"\\nFixture parse output contains ERROR or MISSING nodes.\\n\" >&2; exit 1; fi'",
-    "test": "tree-sitter test"
+    "test": "tree-sitter test",
+    "parse:fixtures": "node scripts/parse-fixtures.mjs",
+    "parse:fixtures:check": "node scripts/parse-fixtures.mjs --check",
+    "test:fixtures:negative": "node scripts/check-fixture-failures.mjs",
+    "check:generated": "node scripts/check-generated.mjs",
+    "check:queries": "node scripts/check-queries.mjs",
+    "check:toolchain": "node scripts/check-toolchain.mjs",
+    "preverify": "npm run check:toolchain",
+    "verify": "npm run check:generated && npm test && npm run parse:fixtures:check && npm run test:fixtures:negative && npm run check:queries"
   },
   "devDependencies": {
     "tree-sitter-cli": "0.26.10"

@@ -1,0 +1,23 @@
+function summarize(name: string, count: number): string {
+  let ready: boolean = true;
+  if (ready) {
+    count++;
+  } else {
+    count--;
+  }
+  while (count > 0) {
+    break;
+  }
+  for (let i = 0; i < count; i++) {
+    continue;
+  }
+  for (const item: string in name) {
+    defer cleanup(item);
+  }
+  switch (name) {
+    case "Ada":
+      return name;
+    default:
+      return "unknown";
+  }
+}
