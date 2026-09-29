@@ -23,7 +23,7 @@ if (missingRoot.status === 0 || !missingRootOutput.includes('Fixture directory n
 }
 
 const invalidFixture = 'test/fixtures/negative/missing-semicolon.frsh';
-const invalid = run(treeSitter, ['parse', invalidFixture]);
+const invalid = run(treeSitter, ['parse', '--grammar-path', '.', invalidFixture]);
 const invalidOutput = `${invalid.stdout ?? ''}${invalid.stderr ?? ''}`;
 if (invalid.error || !/\b(?:ERROR|MISSING)\b/.test(invalidOutput)) {
   console.error(`Negative fixture did not expose an ERROR or MISSING node: ${invalidFixture}`);

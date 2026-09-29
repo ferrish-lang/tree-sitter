@@ -40,7 +40,7 @@ if (!existsSync(fixtureRoot) || !statSync(fixtureRoot).isDirectory()) {
 
   for (const fixture of fixtures) {
     const fixturePath = relative(root, fixture);
-    const result = spawnSync(treeSitter, ['parse', fixturePath], {
+    const result = spawnSync(treeSitter, ['parse', '--grammar-path', '.', fixturePath], {
       cwd: root,
       encoding: 'utf8',
     });
